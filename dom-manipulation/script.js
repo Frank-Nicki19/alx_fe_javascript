@@ -22,7 +22,29 @@ function addQuote() {
         alert("Please enter both a quote and a category.");
     }
 }
+function createAddQuoteForm() {
+    const formContainer = document.createElement('div');
 
+    const newQuoteTextInput = document.createElement('input');
+    newQuoteTextInput.id = 'newQuoteText';
+    newQuoteTextInput.type = 'text';
+    newQuoteTextInput.placeholder = 'Enter a new quote';
+
+    const newQuoteCategoryInput = document.createElement('input');
+    newQuoteCategoryInput.id = 'newQuoteCategory';
+    newQuoteCategoryInput.type = 'text';
+    newQuoteCategoryInput.placeholder = 'Enter quote category';
+
+    const addButton = document.createElement('button');
+    addButton.textContent = 'Add Quote';
+    addButton.onclick = addQuote;
+
+    formContainer.appendChild(newQuoteTextInput);
+    formContainer.appendChild(newQuoteCategoryInput);
+    formContainer.appendChild(addButton);
+
+    document.body.appendChild(formContainer);
+}
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
 // Show a random quote when the page loads
