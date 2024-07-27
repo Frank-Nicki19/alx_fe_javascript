@@ -1,51 +1,114 @@
 const quotes = [
-    {text: "Life is all about working together.", category: "life"},
-    {text: "Never give up, because winners dont.", category: "motivation"},
-    {text: "Orare et Laborare.", category: "inspirational"},
-];
-function showRandomQuote() {
-    const randoIndex = Math.floor(Math.random() * quotes.length);
-    const quote = quotes[randoIndex];
-    const quoteDisplay = document.getElementById('quoteDisplay');
-    quoteDisplay.innerHTML = `${quote.text} - ${quote.category}`;
-}
-function addQuote() {
+    { text: "Life is all about working together.", category: "life" },
+    { text: "Never give up, because winners don't.", category: "motivation" },
+    { text: "Orare et Laborare.", category: "inspirational" },
+  ];
+  
+  // Load quotes from local storage if available
+  function loadQuotes() {
+    const storedQuotes = localStorage.getItem('quotes');
+    if (storedQuotes) {
+      quotes.push(...JSON.parse(storedQuotes));
+    }
+  }
+  
+  // Save quotes to local storage
+  function saveQuotes() {
+    localStorage.setItem('quotes', JSON.stringify(quotes));
+  }
+  
+  // Function to display a random quote
+  function showRandomQuote() {
+    if (quotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      const quote = quotes[randomIndex];
+      const quoteDisplay = document.getElementById('quoteDisplay');
+      quoteDisplay.innerHTML = `${quote.text} - ${quote.category}`;
+      sessionStorage.setItem('lastQuote', JSON.stringify(quote)); // Save the last viewed quote to session storage
+    } else {
+      document.getElementById('quoteDisplay').innerHTML = 'No quotes available.';
+    }
+  }
+  
+  // Function to add a new quote
+  function addQuote() {
     const newQuoteText = document.getElementById('newQuoteText').value.trim();
     const newQuoteCategory = document.getElementById('newQuoteCategory').value.trim();
-
+  
     if (newQuoteText !== "" && newQuoteCategory !== "") {
-        quotes.push({ text: newQuoteText, category: newQuoteCategory });
-        alert("Quote added successfully!");
-        document.getElementById('newQuoteText').value = "";
-        document.getElementById('newQuoteCategory').value = "";
+      quotes.push({ text: newQuoteText, category: newQuoteCategory });
+      saveQuotes();
+      alert("Quote added successfully!");
+      document.getElementById('newQuoteText').value = "";
+      document.getElementById('newQuoteCategory').value = "";
     } else {
-        alert("Please enter both a quote and a category.");
+      alert("Please enter both a quote and a category.");
     }
-}
-function createAddQuoteForm() {
+  }
+  
+  // Function to create the form for adding new quotes
+  function createAddQuoteForm() {
     const formContainer = document.createElement('div');
-
+  
     const newQuoteTextInput = document.createElement('input');
     newQuoteTextInput.id = 'newQuoteText';
     newQuoteTextInput.type = 'text';
     newQuoteTextInput.placeholder = 'Enter a new quote';
-
+  
     const newQuoteCategoryInput = document.createElement('input');
     newQuoteCategoryInput.id = 'newQuoteCategory';
     newQuoteCategoryInput.type = 'text';
     newQuoteCategoryInput.placeholder = 'Enter quote category';
-
+  
     const addButton = document.createElement('button');
     addButton.textContent = 'Add Quote';
     addButton.onclick = addQuote;
-
+  
     formContainer.appendChild(newQuoteTextInput);
     formContainer.appendChild(newQuoteCategoryInput);
     formContainer.appendChild(addButton);
-
+  
     document.body.appendChild(formContainer);
-}
-document.getElementById('newQuote').addEventListener('click', showRandomQuote);
-
-// Show a random quote when the page loads
-window.onload = showRandomQuote;
+  }
+  
+  // Function to export quotes to a JSON file
+  function exportToJsonFile() {
+    const dataStr = JSON.stringify(quotes);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = url;
+    downloadAnchor.download = 'quotes.json';
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
+  }
+  
+  // Function to import quotes from a JSON file
+  function importFromJsonFile(event) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(event) {
+      const importedQuotes = JSON.parse(event.target.result);
+      quotes.push(...importedQuotes);
+      saveQuotes();
+      alert('Quotes imported successfully!');
+    };
+    fileReader.readAsText(event.target.files[0]);
+  }
+  
+  document.getElementById('newQuote').addEventListener('click', showRandomQuote);
+  document.getElementById('exportQuotes').addEventListener('click', exportToJsonFile);
+  
+  // Show a random quote and create the add quote form when the page loads
+  window.onload = () => {
+    loadQuotes();
+    showRandomQuote();
+    createAddQuoteForm();
+  
+    // Show the last viewed quote from session storage if available
+    const lastQuote = sessionStorage.getItem('lastQuote');
+    if (lastQuote) {
+      const quote = JSON.parse(lastQuote);
+      document.getElementById('quoteDisplay').innerHTML = `${quote.text} - ${quote.category}`;
+    }
+  };
