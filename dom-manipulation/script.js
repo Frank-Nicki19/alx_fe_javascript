@@ -77,6 +77,9 @@ async function syncQuotes() {
       if (newQuotes.length > 0) {
           await postQuotesToServer(newQuotes);
       }
+
+      // Notify the user
+      alert('Quotes synced with server!');
   } catch (error) {
       console.error('Error syncing quotes:', error);
   }
