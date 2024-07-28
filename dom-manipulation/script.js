@@ -66,6 +66,22 @@ async function postQuotesToServer(newQuotes) {
   }
 }
 
+// Sync local quotes with the server
+async function syncQuotes() {
+  try {
+      // Fetch quotes from the server
+      await fetchQuotesFromServer();
+
+      // Post new quotes to the server
+      const newQuotes = quotes.filter(quote => !quote.synced); // Assuming `synced` is a property used to mark quotes
+      if (newQuotes.length > 0) {
+          await postQuotesToServer(newQuotes);
+      }
+  } catch (error) {
+      console.error('Error syncing quotes:', error);
+  }
+}
+
 // Function to display a random quote
 function showRandomQuote() {
   if (quotes.length > 0) {
@@ -204,7 +220,7 @@ window.onload = () => {
       document.getElementById('categoryFilter').value = lastSelectedCategory;
   }
   filterQuotes();
-  fetchQuotesFromServer(); // Fetch quotes from the server when the page loads
+  syncQuotes(); // Sync quotes when the page loads
 };
 
 document.getElementById('categoryFilter').addEventListener('change', () => {
@@ -213,5 +229,5 @@ document.getElementById('categoryFilter').addEventListener('change', () => {
   filterQuotes();
 });
 
-// Periodically fetch quotes from the server
-setInterval(fetchQuotesFromServer, 60000); // Fetch every 60 seconds
+// Periodically sync quotes
+setInterval(syncQuotes, 60000); // Sync every 60 seconds
