@@ -46,6 +46,26 @@ function mergeQuotes(serverQuotes) {
   }
 }
 
+// Post new quotes to the server
+async function postQuotesToServer(newQuotes) {
+  try {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newQuotes),
+      });
+      if (response.ok) {
+          alert('Quotes successfully posted to the server.');
+      } else {
+          alert('Failed to post quotes to the server.');
+      }
+  } catch (error) {
+      console.error('Error posting quotes to the server:', error);
+  }
+}
+
 // Function to display a random quote
 function showRandomQuote() {
   if (quotes.length > 0) {
@@ -65,9 +85,11 @@ function addQuote() {
   const newQuoteCategory = document.getElementById('newQuoteCategory').value.trim();
 
   if (newQuoteText !== "" && newQuoteCategory !== "") {
-      quotes.push({ text: newQuoteText, category: newQuoteCategory });
+      const newQuote = { text: newQuoteText, category: newQuoteCategory };
+      quotes.push(newQuote);
       saveQuotes();
       populateCategories(); // Update the categories in the dropdown
+      postQuotesToServer([newQuote]); // Send new quote to the server
       alert("Quote added successfully!");
       document.getElementById('newQuoteText').value = "";
       document.getElementById('newQuoteCategory').value = "";
