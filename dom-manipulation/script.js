@@ -20,9 +20,10 @@ function saveQuotes() {
 // Fetch quotes from the server
 async function fetchQuotesFromServer() {
   try {
-      const response = await fetch('https://jsonplaceholder.typicode.com/quotes');
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts');
       const serverQuotes = await response.json();
-      mergeQuotes(serverQuotes);
+      const formattedQuotes = serverQuotes.map(post => ({ text: post.title, category: 'server' }));
+      mergeQuotes(formattedQuotes);
   } catch (error) {
       console.error('Error fetching quotes from server:', error);
   }
